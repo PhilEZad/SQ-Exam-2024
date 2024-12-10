@@ -90,8 +90,8 @@ namespace HotelBooking.UnitTests
         }
 
         [Theory]
-        [InlineData(-1)] // Past date
-        [InlineData(1)] // Invalid: startDate > endDate
+        [InlineData(-1)]
+        [InlineData(1)]
         public void FindAvailableRoom_Should_ThrowArgumentException(int dateOffset)
         {
             // Arrange
@@ -170,7 +170,7 @@ namespace HotelBooking.UnitTests
         }
         
         [Theory]
-        [InlineData(1)] // Invalid: startDate > endDate
+        [InlineData(1)]
         public void GetFullyOccupiedDates_Should_ThrowArgumentException(int dateOffset)
         {
             // Arrange
