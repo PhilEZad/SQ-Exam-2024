@@ -1,122 +1,75 @@
-﻿# Test Plan for `BookingManager`
+﻿Here is your data formatted into markdown tables:
 
-## **Method: `CreateBooking`**
+### CreateBooking Method
 
-### **Test 1: Successfully create a booking**
-- **Input**:
-    - Booking with `StartDate` as tomorrow and `EndDate` two days later.
-- **Expected Output**:
-    - `true`
-- **Verification**:
-    - Booking is added to the repository with an assigned `RoomId`.
-    - `IsActive` is set to `true`.
+**Equivalence Classes:**
 
----
+| Class | Description |
+|-------|-------------|
+| SDV   | StartDate is valid (in the future). |
+| SDP   | StartDate is in the past. |
+| EDV   | EndDate is valid (after StartDate). |
+| EDP   | EndDate is before StartDate. |
+| RA    | Room is available for the given period. |
+| RNA   | Room is not available for the given period. |
 
-### **Test 2: Fail to create a booking when no room is available**
-- **Input**:
-    - Booking with `StartDate` and `EndDate` overlapping fully occupied dates.
-- **Expected Output**:
-    - `false`
+**Decision Table for CreateBooking**
 
----
-
-### **Test 3: Fail to create a booking when `StartDate` is in the past**
-- **Input**:
-    - Booking with `StartDate` as yesterday.
-- **Expected Output**:
-    - `ArgumentException` thrown.
+| Conditions                          | SDV (StartDate valid) | SDP (StartDate in the past) | EDV (EndDate valid) | EDP (EndDate before StartDate) | RA (Room available) | RNA (Room not available) | Action |
+|--------------------------------------|-----------------------|----------------------------|---------------------|--------------------------------|---------------------|--------------------------|--------|
+| C1: Valid dates, Room available     | Yes                   | No                         | Yes                 | Yes                            | Yes                 | No                       | Return true (Booking created) |
+| C2: Valid dates, Room not available | Yes                   | No                         | Yes                 | Yes                            | No                  | Yes                      | Return false (No available room) |
+| C3: Valid StartDate, invalid EndDate | Yes                   | No                         | No                  | Yes                            | -                   | -                        | Return false (Invalid dates) |
+| C4: Past StartDate, valid EndDate   | No                    | Yes                        | Yes                 | Yes                            | -                   | -                        | Return false (Invalid dates) |
+| C5: Valid StartDate, EndDate before StartDate | Yes           | No                         | No                  | Yes                            | Yes                 | Yes                      | Return false (Invalid dates) |
+| C6: Past StartDate, EndDate before StartDate | No            | Yes                        | No                  | Yes                            | -                   | -                        | Return false (Invalid dates) |
 
 ---
 
-### **Test 4: Fail to create a booking when `StartDate` > `EndDate`**
-- **Input**:
-    - Booking with `StartDate` as tomorrow and `EndDate` as today.
-- **Expected Output**:
-    - `ArgumentException` thrown.
+### FindAvailableRoom Method
+
+**Equivalence Classes:**
+
+| Class | Description |
+|-------|-------------|
+| SDV   | StartDate is valid (in the future). |
+| SDP   | StartDate is in the past. |
+| EDV   | EndDate is valid (after StartDate). |
+| EDP   | EndDate is before StartDate. |
+| RA    | Room is available for the given period. |
+| RNA   | Room is not available for the given period. |
+
+**Table for FindAvailableRoom**
+
+| Conditions                                        | SDV (StartDate valid) | SDP (StartDate in the past) | EDV (EndDate valid) | EDP (EndDate before StartDate) | RA (Room available) | RNA (Room not available) | Action |
+|--------------------------------------------------|-----------------------|----------------------------|---------------------|--------------------------------|---------------------|--------------------------|--------|
+| C1: Valid StartDate and EndDate, Room available  | Yes                   | No                         | Yes                 | Yes                            | Yes                 | No                       | Return room ID |
+| C2: Valid StartDate and EndDate, Room not available | Yes                   | No                         | Yes                 | Yes                            | No                  | Yes                      | Return -1 (No available room) |
+| C3: Valid StartDate, invalid EndDate             | Yes                   | No                         | No                  | Yes                            | -                   | -                        | Throw ArgumentException |
+| C4: Past StartDate, valid EndDate                | No                    | Yes                        | Yes                 | Yes                            | -                   | -                        | Throw ArgumentException |
+| C5: Valid StartDate, EndDate before StartDate    | Yes                   | No                         | No                  | Yes                            | -                   | -                        | Throw ArgumentException |
 
 ---
 
-## **Method: `FindAvailableRoom`**
+### GetFullyOccupiedDates Method
 
-### **Test 1: Find an available room successfully**
-- **Input**:
-    - `StartDate`: tomorrow.
-    - `EndDate`: two days later.
-- **Precondition**:
-    - At least one room has no bookings overlapping the given period.
-- **Expected Output**:
-    - A valid `RoomId`.
+**Equivalence Classes:**
 
----
+| Class | Description |
+|-------|-------------|
+| SDV   | StartDate is valid (in the future). |
+| SDP   | StartDate is later than EndDate. |
+| EDV   | EndDate is valid (after StartDate). |
+| FO    | At least one date in the range is fully occupied. |
+| NFO   | No date in the range is fully occupied. |
 
-### **Test 2: No available room found**
-- **Input**:
-    - `StartDate`: tomorrow.
-    - `EndDate`: two days later.
-- **Precondition**:
-    - All rooms have overlapping bookings during the given period.
-- **Expected Output**:
-    - `-1`.
+**Decision Table for GetFullyOccupiedDates**
 
----
-
-### **Test 3: Invalid date range (StartDate in the past)**
-- **Input**:
-    - `StartDate`: yesterday.
-    - `EndDate`: two days later.
-- **Expected Output**:
-    - `ArgumentException` thrown.
+| Conditions                                        | SDV (StartDate valid) | SDP (StartDate later than EndDate) | EDV (EndDate valid) | FO (Fully occupied dates) | NFO (No fully occupied dates) | Action |
+|--------------------------------------------------|-----------------------|-----------------------------------|---------------------|---------------------------|--------------------------------|--------|
+| C1: Valid dates, some fully occupied dates      | Yes                   | No                                | Yes                 | Yes                        | No                             | Return list of fully occupied dates |
+| C2: Valid dates, no fully occupied dates        | Yes                   | No                                | Yes                 | No                         | Yes                            | Return empty list |
+| C3: StartDate later than EndDate                | No                    | Yes                               | Yes                 | -                          | -                              | Throw ArgumentException |
+| C4: Valid StartDate, invalid EndDate            | Yes                   | No                                | No                  | Yes                        | -                              | Throw ArgumentException |
 
 ---
-
-### **Test 4: Invalid date range (StartDate > EndDate)**
-- **Input**:
-    - `StartDate`: tomorrow.
-    - `EndDate`: today.
-- **Expected Output**:
-    - `ArgumentException` thrown.
-
----
-
-## **Method: `GetFullyOccupiedDates`**
-
-### **Test 1: Retrieve fully occupied dates**
-- **Input**:
-    - `StartDate`: tomorrow.
-    - `EndDate`: seven days later.
-- **Precondition**:
-    - At least one date in the range is fully occupied (all rooms are booked).
-- **Expected Output**:
-    - A list of fully occupied dates.
-
----
-
-### **Test 2: No fully occupied dates**
-- **Input**:
-    - `StartDate`: tomorrow.
-    - `EndDate`: seven days later.
-- **Precondition**:
-    - No date in the range has all rooms booked.
-- **Expected Output**:
-    - An empty list.
-
----
-
-### **Test 3: Invalid date range (StartDate > EndDate)**
-- **Input**:
-    - `StartDate`: seven days later.
-    - `EndDate`: tomorrow.
-- **Expected Output**:
-    - `ArgumentException` thrown.
-
----
-
-### **Test 4: Fully occupied dates when there are no rooms**
-- **Input**:
-    - `StartDate`: tomorrow.
-    - `EndDate`: seven days later.
-- **Precondition**:
-    - The `roomRepository` is empty.
-- **Expected Output**:
-    - An empty list.
