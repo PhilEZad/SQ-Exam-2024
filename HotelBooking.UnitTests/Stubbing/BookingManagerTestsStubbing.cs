@@ -7,13 +7,13 @@ using Xunit;
 
 namespace HotelBooking.UnitTests
 {
-    public class BookingManagerTests
+    public class BookingManagerTestsStubbing
     {
         private BookingManager bookingManager;
         private Mock<IRepository<Booking>> bookingRepository;
         private Mock<IRepository<Room>> roomRepository;
 
-        public BookingManagerTests()
+        public BookingManagerTestsStubbing()
         {
             bookingRepository = new Mock<IRepository<Booking>>();
             roomRepository = new Mock<IRepository<Room>>();
