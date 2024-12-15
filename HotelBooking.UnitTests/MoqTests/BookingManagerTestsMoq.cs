@@ -61,8 +61,11 @@ namespace HotelBooking.UnitTests.MoqTests
             {
                 bookingRepository.Verify(
                     repo => repo.Add(It.Is<Booking>(b =>
-                        b.CustomerId == customerId && b.StartDate == newBooking.StartDate &&
-                        b.EndDate == newBooking.EndDate && b.IsActive == true)), Times.Once);
+                        b.CustomerId == customerId && 
+                        b.StartDate == newBooking.StartDate &&
+                        b.EndDate == newBooking.EndDate && 
+                        b.IsActive == true
+                        )), Times.Once);
             }
             else
             {
